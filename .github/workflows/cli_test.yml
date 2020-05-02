@@ -25,3 +25,17 @@ jobs:
         pq show --help
         pq csv --help
         pq inspect --help
+    - name: Run show 
+      run: |
+        pq show ./tests/test.parquet
+        pq show --format github ./tests/test.parquet
+        pq show --head 10 ./tests/test.parquet
+        pq show --columns one,three ./tests/test.parquet
+    - name: Run csv
+      run: |
+        pq csv ./tests/test.parquet
+        pq csv --head 10 ./tests/test.parquet
+        pq csv --columns one,three ./tests/test.parquet
+    - name: Run inspect
+      run: |
+        pq inspect ./tests/test.parquet
