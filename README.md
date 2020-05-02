@@ -4,13 +4,13 @@
 ![Run Unittest](https://github.com/ktrueda/parquet-tools/workflows/Run%20Unittest/badge.svg)
 ![Run CLI test](https://github.com/ktrueda/parquet-tools/workflows/Run%20CLI%20test/badge.svg)
 
-This is pip version of [parquet-tools](https://github.com/apache/parquet-mr).
+This is a pip version of [parquet-tools](https://github.com/apache/parquet-mr). In other words, this is a CLI tools of [Apache Arrow](https://github.com/apache/arrow).
+You can show parquet file content/shema on local disk or on AWS S3.
 
 ## Features
 
-- Read Parquet data
-- Read Parquet metadata/schema
-- Read Parquet file on cloud storage like S3 (Future)
+- Read Parquet data (local file or file on S3)
+- Read Parquet metadata/schema (local file or file on S3)
 
 ## Installation
 
@@ -38,7 +38,7 @@ optional arguments:
 ```
 
 
-## Usage Example
+## Usage Examples
 
 #### Show parquet
 
@@ -56,7 +56,7 @@ $ pq show test.parquet
 #### Cat CSV parquet and [csvq](https://github.com/mithrandie/csvq)
 
 ```bash
-$ pq csv test.parquet |csvq "select one, three where three"
+$ pq csv s3://bucket-name/test.parquet |csvq "select one, three where three"
 +-------+-------+
 |  one  | three |
 +-------+-------+

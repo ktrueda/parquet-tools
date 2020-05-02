@@ -9,7 +9,7 @@ setup(
     ''',
     url="https://github.com/ktrueda/parquet-tools",
     packages=find_packages(),
-    install_requires=['pyarrow', 'pandas', 'tabulate'],
+    install_requires=['pyarrow', 'pandas', 'tabulate', 'boto3'],
     include_package_data=True,
     entry_points="""
   [console_scripts]

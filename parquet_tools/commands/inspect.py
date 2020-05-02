@@ -3,6 +3,8 @@ from typing import List
 
 import pyarrow.parquet as pq
 
+from .utils import is_s3_file, fetch_s3_to_tmp, get_aws_session
+
 
 def dedent(text: str) -> str:
     return '\n'.join(map(lambda x: x.strip(), text.split('\n')))
@@ -12,18 +14,32 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
     paser.add_argument('file',
                        metavar='FILE',
                        type=str,
-                       help='The parquet file to inspect')
+                       help='''The parquet file to inspect
+                       e.g. ./target.parquet or s3://bucket-name/target.parquet
+                       ''')
+    paser.add_argument('--awsprofile',
+                       type=str,
+                       required=False,
+                       default='default',
+                       help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
+
     paser.set_defaults(handler=_cli)
     return paser
 
 
 def _cli(args: Namespace) -> None:
-    _execute(
-        filename=args.file,
-    )
+    if is_s3_file(args.file):
+        with fetch_s3_to_tmp(aws_session=get_aws_session(args.awsprofile), s3uri=args.file) as localfile:
+            _execute(
+                filename=localfile,
+            )
+    else:
+        _execute(
+            filename=args.file,
+        )
 
 
-def _execute(filename: str,) -> None:
+def _execute(filename: str) -> None:
     pq_file: pq.ParquetFile = pq.ParquetFile(filename)
     file_meta: pq.FileMetaData = pq_file.metadata
     print(_file_meta_expression(file_meta))

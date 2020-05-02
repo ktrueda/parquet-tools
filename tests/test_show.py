@@ -1,30 +1,14 @@
-import pytest
-from parquet_tools.commands.show import configure_parser, _execute
 import argparse
-import pyarrow as pa
-import pandas as pd
-from tempfile import TemporaryDirectory
-import numpy as np
+
+import pytest
+
+from parquet_tools.commands.show import _execute, configure_parser
 
 
 @pytest.fixture
 def parser():
     parser = argparse.ArgumentParser()
     return configure_parser(parser)
-
-
-@pytest.fixture
-def parquet_file():
-    df = pd.DataFrame(
-        {'one': [-1, np.nan, 2.5],
-         'two': ['foo', 'bar', 'baz'],
-         'three': [True, False, True]}
-    )
-    table = pa.Table.from_pandas(df)
-    with TemporaryDirectory() as tmp_path:
-        pq_path = f'{tmp_path}/test.pq'
-        pa.parquet.write_table(table, pq_path)
-        yield pq_path
 
 
 @pytest.mark.parametrize('arg, valid,exptected', [
@@ -36,7 +20,8 @@ def parquet_file():
             'columns': [],
             'file': 'file1.parquet',
             'format': 'psql',
-            'head': -1
+            'head': -1,
+            'awsprofile': 'default'
         }
     ),
     # most complex one
@@ -46,7 +31,19 @@ def parquet_file():
             'columns': ['col1', 'col2'],
             'file': 'file1.parquet',
             'format': 'github',
-            'head': 100
+            'head': 100,
+            'awsprofile': 'default'
+        }
+    ),
+    # file is on S3
+    (
+        '--awsprofile user1 s3://bucket-name/file1.parquet', True,
+        {
+            'columns': [],
+            'file': 's3://bucket-name/file1.parquet',
+            'format': 'psql',
+            'head': -1,
+            'awsprofile': 'user1'
         }
     ),
     # empty columns

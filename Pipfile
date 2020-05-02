@@ -13,9 +13,10 @@ pytest-mock = "*"
 pyarrow = "*"
 pandas = "*"
 tabulate = "*"
+boto3 = "*"
+moto = "*"
 
 [packages]
-parquet-tools = {path = "."}
 
 [requires]
 python_version = "3.8"

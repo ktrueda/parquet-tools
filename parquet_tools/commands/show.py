@@ -1,15 +1,23 @@
-from argparse import Namespace
-import pyarrow.parquet as pq
+from argparse import ArgumentParser, Namespace
+from logging import getLogger
+
 import pandas as pd
+import pyarrow.parquet as pq
 from tabulate import tabulate
-from argparse import ArgumentParser
+
+from .utils import get_aws_session, is_s3_file, fetch_s3_to_tmp
+
+logger = getLogger(__name__)
 
 
 def configure_parser(paser: ArgumentParser) -> ArgumentParser:
     paser.add_argument('file',
                        metavar='FILE',
                        type=str,
-                       help='The parquet file to print to stdout')
+                       help='''
+                       The parquet file to print to stdout.
+                       e.g. ./target.parquet or s3://bucker-name/target.parquet
+                       ''')
     paser.add_argument('--format', '-f',
                        action='store',
                        required=False,
@@ -30,17 +38,33 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
                        required=False,
                        default=-1,
                        help='Show only head record(default:infinity)')
+    paser.add_argument('--awsprofile',
+                       type=str,
+                       required=False,
+                       default='default',
+                       help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
+
     paser.set_defaults(handler=_cli)
     return paser
 
 
 def _cli(args: Namespace) -> None:
-    _execute(
-        filename=args.file,
-        format=args.format,
-        head=args.head,
-        columns=args.columns
-    )
+    if is_s3_file(args.file):
+        with fetch_s3_to_tmp(aws_session=get_aws_session(args.awsprofile),
+                             s3uri=args.file) as localfile:
+            _execute(
+                filename=localfile,
+                format=args.format,
+                head=args.head,
+                columns=args.columns
+            )
+    else:
+        _execute(
+            filename=args.file,
+            format=args.format,
+            head=args.head,
+            columns=args.columns
+        )
 
 
 def _execute(filename: str, format: str, head: int, columns: list) -> None:
