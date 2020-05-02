@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"python.pythonPath": ".venv/bin/python3.8",
+		"python.linting.flake8Enabled": true,
+		"python.linting.flake8Path": ".venv/bin/flake8",
+		"python.linting.flake8Args": [
+			"--max-line-length=240",
+			"--ignore=E402,E501,E722,E252,W504,W605"
+		],
+		"python.formatting.autopep8Path": ".venv/bin/autopep8",
+		"python.formatting.provider": "autopep8",
+		"editor.formatOnSave": true,
+		"python.formatting.autopep8Args": [
+			"--max-line-length=240",
+			"--ignore=E402,E501,E722,E252,W504,W605"
+		],
+		"python.linting.mypyEnabled": true,
+		"python.linting.mypyPath": ".venv/bin/mypy"
+	}
+}
