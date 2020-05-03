@@ -22,8 +22,8 @@ $ pip install git+ssh://github.com/ktrueda/parquet-tools.git
 ## Usage
 
 ```bash
-$ pq --help
-usage: pq [-h] {show,csv,inspect} ...
+$ parquet-tools --help
+usage: parquet-tools [-h] {show,csv,inspect} ...
 
 parquet CLI tools
 
@@ -43,7 +43,7 @@ optional arguments:
 #### Show parquet
 
 ```bash
-$ pq show test.parquet
+$ parquet-tools show test.parquet
 +-------+-------+---------+
 |   one | two   | three   |
 |-------+-------+---------|
@@ -56,7 +56,7 @@ $ pq show test.parquet
 #### Cat CSV parquet and [csvq](https://github.com/mithrandie/csvq)
 
 ```bash
-$ pq csv s3://bucket-name/test.parquet |csvq "select one, three where three"
+$ parquet-tools csv s3://bucket-name/test.parquet |csvq "select one, three where three"
 +-------+-------+
 |  one  | three |
 +-------+-------+

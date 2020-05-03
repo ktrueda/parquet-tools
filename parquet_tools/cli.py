@@ -4,7 +4,7 @@ from parquet_tools.commands import show, csv, inspect
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog='pq',
+        prog='parquet-tootls',
         description='parquet CLI tools'
     )
     subparsers = parser.add_subparsers()
