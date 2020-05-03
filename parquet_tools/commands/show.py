@@ -8,8 +8,8 @@ import pandas as pd
 import pyarrow.parquet as pq
 from tabulate import tabulate
 
-from .utils import (InvalidCommandExcpetion, ParquetFile,
-                    get_filepaths_from_objs, to_parquet_file)
+from .utils import (FileNotFoundException, InvalidCommandExcpetion,
+                    ParquetFile, get_filepaths_from_objs, to_parquet_file)
 
 logger = getLogger(__name__)
 
@@ -60,6 +60,8 @@ def _cli(args: Namespace) -> None:
             for f in args.file]
 
         with get_filepaths_from_objs(pfs) as localfiles:
+            if len(localfiles) == 0:
+                raise FileNotFoundException('File matching that expression not found.')
             _execute(
                 filenames=localfiles,
                 format=args.format,
@@ -67,6 +69,8 @@ def _cli(args: Namespace) -> None:
                 columns=args.columns
             )
     except InvalidCommandExcpetion as e:
+        print(str(e), file=sys.stderr)
+    except FileNotFoundException as e:
         print(str(e), file=sys.stderr)
 
 

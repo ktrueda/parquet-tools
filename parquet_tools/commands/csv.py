@@ -6,8 +6,8 @@ from typing import List
 import pandas as pd
 import pyarrow.parquet as pq
 
-from .utils import (InvalidCommandExcpetion, ParquetFile,
-                    get_filepaths_from_objs, to_parquet_file)
+from .utils import (FileNotFoundException, InvalidCommandExcpetion,
+                    ParquetFile, get_filepaths_from_objs, to_parquet_file)
 
 
 def configure_parser(paser: ArgumentParser) -> ArgumentParser:
@@ -42,14 +42,17 @@ def _cli(args: Namespace) -> None:
         pfs: List[ParquetFile] = [
             to_parquet_file(file_exp=f, awsprofile=args.awsprofile)
             for f in args.file]
-
         with get_filepaths_from_objs(pfs) as localfiles:
+            if len(localfiles) == 0:
+                raise FileNotFoundException('File matching that expression not found.')
             _execute(
                 filenames=localfiles,
                 head=args.head,
                 columns=args.columns
             )
     except InvalidCommandExcpetion as e:
+        print(str(e), file=sys.stderr)
+    except FileNotFoundException as e:
         print(str(e), file=sys.stderr)
 
 

@@ -1,10 +1,12 @@
 import glob
+import sys
 from abc import ABC, abstractmethod
 from contextlib import ExitStack, contextmanager
 from dataclasses import dataclass
 from logging import getLogger
+from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Iterator, List
+from typing import Iterator, List, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
 
@@ -16,6 +18,10 @@ logger = getLogger(__name__)
 class InvalidCommandExcpetion(Exception):
     '''Exception for invalid command. Argment parser raises this Exception.
     '''
+    pass
+
+
+class FileNotFoundException(Exception):
     pass
 
 
@@ -31,6 +37,9 @@ class ParquetFile(ABC):
     def validation(self) -> None:
         '''validate properties
         '''
+        pass
+
+    def skip_reason(self) -> Optional[str]:
         pass
 
     @abstractmethod
@@ -60,6 +69,11 @@ class LocalParquetFile(ParquetFile):
     '''
     path: str
 
+    def skip_reason(self) -> Optional[str]:
+        if not self.is_wildcard() and not self.path.endswith('.parquet'):
+            return f'File({self.path}) is not parquet file'
+        return None
+
     def is_wildcard(self) -> bool:
         return '*' in self.path
 
@@ -71,6 +85,10 @@ class LocalParquetFile(ParquetFile):
 
     @contextmanager
     def get_local_path(self) -> Iterator[str]:
+        if self.is_wildcard():
+            raise Exception('Please resolve first.')
+        if not Path(self.path).exists():
+            raise FileNotFoundException(f'File({self.path}) not found')
         yield self.path
 
 
@@ -88,6 +106,11 @@ class S3ParquetFile(ParquetFile):
         if self.is_wildcard() and not self.key.index('*') in (-1, len(self.key) - 1):
             raise InvalidCommandExcpetion('You can use * only end of the path')
 
+    def skip_reason(self) -> Optional[str]:
+        if not self.is_wildcard() and not self.key.endswith('.parquet'):
+            return f'S3 object(s3://{self.bucket}/{self.key}) is not parquet file'
+        return None
+
     def is_wildcard(self) -> bool:
         return '*' in self.key
 
@@ -100,6 +123,8 @@ class S3ParquetFile(ParquetFile):
         if list_res['IsTruncated']:
             raise Exception(f'Too much file match s3://{self.bucket}/{self.key}')
 
+        if list_res['KeyCount'] == 0:
+            return []
         keys = [e['Key'] for e in list_res['Contents']]
         return sorted(
             [S3ParquetFile(aws_session=self.aws_session, bucket=self.bucket, key=key) for key in keys],
@@ -113,9 +138,13 @@ class S3ParquetFile(ParquetFile):
         with TemporaryDirectory() as tmp_path:
             localfile = f'{tmp_path}/{uuid4()}.parquet'
             logger.info(f'Download stat parquet file on s3://{self.bucket}/{self.key} -> {localfile}')
-            self.aws_session.resource('s3')\
-                .meta.client.download_file(self.bucket, self.key, localfile)
-            yield localfile
+            try:
+                self.aws_session.resource('s3')\
+                    .meta.client.download_file(self.bucket, self.key, localfile)
+            except Exception:
+                raise FileNotFoundException(f's3://{self.bucket}/{self.key} not found or cannot access')
+            else:
+                yield localfile
 
 
 def get_aws_session(profile_name: str='default') -> boto3.Session:
@@ -163,7 +192,10 @@ def _resolve_wildcard(obj: ParquetFile) -> List[ParquetFile]:
 @contextmanager
 def _get_filepaths(obj: ParquetFile) -> Iterator[List[str]]:
     with ExitStack() as stack:
-        yield [
-            stack.enter_context(pf.get_local_path())
-            for pf in _resolve_wildcard(obj)
-        ]
+        ret = []
+        for pf in _resolve_wildcard(obj):
+            if pf.skip_reason():
+                print(pf.skip_reason(), file=sys.stderr)
+            else:
+                ret.append(stack.enter_context(pf.get_local_path()))
+        yield ret
