@@ -34,17 +34,17 @@ def parquet_file():
         'file1.parquet', True,
         {
             'columns': [],
-            'file': 'file1.parquet',
+            'file': ['file1.parquet'],
             'head': -1,
             'awsprofile': 'default'
         }
     ),
     # most complex one
     (
-        '--columns col1,col2 --head 100 --awsprofile user1 file1.parquet', True,
+        '--columns col1,col2 --head 100 --awsprofile user1 file1.parquet file2.parquet', True,
         {
             'columns': ['col1', 'col2'],
-            'file': 'file1.parquet',
+            'file': ['file1.parquet', 'file2.parquet'],
             'head': 100,
             'awsprofile': 'user1'
         }
@@ -70,7 +70,7 @@ def test_configure_parser(parser, arg, valid, exptected):
 
 def test_excute(capfd, parquet_file):
     _execute(
-        filename=parquet_file,
+        filenames=[parquet_file],
         head=-1,
         columns=[]
     )

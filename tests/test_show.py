@@ -18,7 +18,7 @@ def parser():
         'file1.parquet', True,
         {
             'columns': [],
-            'file': 'file1.parquet',
+            'file': ['file1.parquet'],
             'format': 'psql',
             'head': -1,
             'awsprofile': 'default'
@@ -26,10 +26,10 @@ def parser():
     ),
     # most complex one
     (
-        '--columns col1,col2 --format github --head 100 file1.parquet', True,
+        '--columns col1,col2 --format github --head 100 file1.parquet file2.parquet', True,
         {
             'columns': ['col1', 'col2'],
-            'file': 'file1.parquet',
+            'file': ['file1.parquet', 'file2.parquet'],
             'format': 'github',
             'head': 100,
             'awsprofile': 'default'
@@ -40,7 +40,7 @@ def parser():
         '--awsprofile user1 s3://bucket-name/file1.parquet', True,
         {
             'columns': [],
-            'file': 's3://bucket-name/file1.parquet',
+            'file': ['s3://bucket-name/file1.parquet'],
             'format': 'psql',
             'head': -1,
             'awsprofile': 'user1'
@@ -72,7 +72,7 @@ def test_configure_parser(parser, arg, valid, exptected):
 
 def test_excute(capfd, parquet_file):
     _execute(
-        filename=parquet_file,
+        filenames=[parquet_file],
         format='psql',
         head=-1,
         columns=[]

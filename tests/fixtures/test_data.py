@@ -22,7 +22,14 @@ def parquet_file():
 
 
 @pytest.fixture
-def parquet_file_s3(parquet_file, aws_session, aws_s3_bucket):
+def parquet_file_s3_1(parquet_file, aws_session, aws_s3_bucket):
     aws_session.resource('s3')\
-        .meta.client.upload_file(parquet_file, aws_s3_bucket, 'target.parquet')
-    return f's3://{aws_s3_bucket}/target.parquet'
+        .meta.client.upload_file(parquet_file, aws_s3_bucket, 'target1.parquet')
+    return aws_s3_bucket, 'target1.parquet'
+
+
+@pytest.fixture
+def parquet_file_s3_2(parquet_file, aws_session, aws_s3_bucket):
+    aws_session.resource('s3')\
+        .meta.client.upload_file(parquet_file, aws_s3_bucket, 'target2.parquet')
+    return aws_s3_bucket, 'target2.parquet'

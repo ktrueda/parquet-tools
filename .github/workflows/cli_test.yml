@@ -27,15 +27,17 @@ jobs:
         parquet-tools inspect --help
     - name: Run show 
       run: |
-        parquet-tools show ./tests/test.parquet
-        parquet-tools show --format github ./tests/test.parquet
-        parquet-tools show --head 10 ./tests/test.parquet
-        parquet-tools show --columns one,three ./tests/test.parquet
+        parquet-tools show ./tests/test1.parquet
+        parquet-tools show ./tests/test1.parquet ./tests/test2.parquet
+        parquet-tools show --format github ./tests/test1.parquet
+        parquet-tools show --head 10 ./tests/test1.parquet
+        parquet-tools show --columns one,three ./tests/test1.parquet
     - name: Run csv
       run: |
-        parquet-tools csv ./tests/test.parquet
-        parquet-tools csv --head 10 ./tests/test.parquet
-        parquet-tools csv --columns one,three ./tests/test.parquet
+        parquet-tools csv ./tests/test1.parquet
+        parquet-tools csv ./tests/test1.parquet ./tests/test2.parquet
+        parquet-tools csv --head 10 ./tests/test1.parquet
+        parquet-tools csv --columns one,three ./tests/test1.parquet
     - name: Run inspect
       run: |
-        parquet-tools inspect ./tests/test.parquet
+        parquet-tools inspect ./tests/test1.parquet

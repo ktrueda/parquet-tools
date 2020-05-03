@@ -40,10 +40,23 @@ optional arguments:
 
 ## Usage Examples
 
-#### Show parquet
+#### Show local parquet file
 
 ```bash
 $ parquet-tools show test.parquet
++-------+-------+---------+
+|   one | two   | three   |
+|-------+-------+---------|
+|  -1   | foo   | True    |
+| nan   | bar   | False   |
+|   2.5 | baz   | True    |
++-------+-------+---------+
+```
+
+#### Show parquet file on S3
+
+```bash
+$ parquet-tools show s3://bucket-name/prefix/*
 +-------+-------+---------+
 |   one | two   | three   |
 |-------+-------+---------|
@@ -64,6 +77,3 @@ $ parquet-tools csv s3://bucket-name/test.parquet |csvq "select one, three where
 | 2.5   | True  |
 +-------+-------+
 ```
-
-
-This software includes the work that is distributed in the Apache License 2.0.

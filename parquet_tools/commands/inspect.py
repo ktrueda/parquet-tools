@@ -1,9 +1,15 @@
 from argparse import ArgumentParser, Namespace
 from typing import List
+import sys
 
 import pyarrow.parquet as pq
 
-from .utils import is_s3_file, fetch_s3_to_tmp, get_aws_session
+from .utils import(
+    ParquetFile,
+    to_parquet_file,
+    S3ParquetFile,
+    get_filepaths_from_objs
+)
 
 
 def dedent(text: str) -> str:
@@ -28,15 +34,14 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
 
 
 def _cli(args: Namespace) -> None:
-    if is_s3_file(args.file):
-        with fetch_s3_to_tmp(aws_session=get_aws_session(args.awsprofile), s3uri=args.file) as localfile:
+    pf: ParquetFile = to_parquet_file(file_exp=args.file, awsprofile=args.awsprofile)
+    with get_filepaths_from_objs([pf]) as localfiles:
+        if len(localfiles) > 1:
+            print('Cannot inspect more than 1 files', file=sys.stderr)
+        else:
             _execute(
-                filename=localfile,
+                filename=localfiles[0],
             )
-    else:
-        _execute(
-            filename=args.file,
-        )
 
 
 def _execute(filename: str) -> None:

@@ -1,6 +1,4 @@
 .venv
-*.jar
-*.parquet
 .mypy_cache
 .pytest_cache
 __pycache__
