@@ -16,7 +16,7 @@ You can show parquet file content/shema on local disk or on AWS S3.
 
 
 ```bash
-$ pip install git+ssh://github.com/ktrueda/parquet-tools.git
+$ pip install parquet-tools
 ```
 
 ## Usage

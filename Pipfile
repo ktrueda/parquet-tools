@@ -17,6 +17,8 @@ boto3 = "*"
 moto = "*"
 
 [packages]
+wheel = "*"
+twine = "*"
 
 [requires]
 python_version = "3.8"
