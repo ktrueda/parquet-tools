@@ -1,16 +1,20 @@
 import glob
-import sys
 from abc import ABC, abstractmethod
 from contextlib import ExitStack, contextmanager
 from dataclasses import dataclass
+from functools import reduce
 from logging import getLogger
 from pathlib import Path
+from sys import stderr
 from tempfile import TemporaryDirectory
 from typing import Iterator, List, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
 
 import boto3
+import pandas as pd
+import pyarrow.parquet as pq
+from pyarrow import lib as pyarrowlib
 
 logger = getLogger(__name__)
 
@@ -39,9 +43,6 @@ class ParquetFile(ABC):
         '''
         pass
 
-    def skip_reason(self) -> Optional[str]:
-        pass
-
     @abstractmethod
     def is_wildcard(self) -> bool:
         '''Return if this object correspond one or more object.
@@ -68,11 +69,6 @@ class LocalParquetFile(ParquetFile):
     '''Parquet file object on local disk
     '''
     path: str
-
-    def skip_reason(self) -> Optional[str]:
-        if not self.is_wildcard() and not self.path.endswith('.parquet'):
-            return f'File({self.path}) is not parquet file'
-        return None
 
     def is_wildcard(self) -> bool:
         return '*' in self.path
@@ -105,11 +101,6 @@ class S3ParquetFile(ParquetFile):
         '''
         if self.is_wildcard() and not self.key.index('*') in (-1, len(self.key) - 1):
             raise InvalidCommandExcpetion('You can use * only end of the path')
-
-    def skip_reason(self) -> Optional[str]:
-        if not self.is_wildcard() and not self.key.endswith('.parquet'):
-            return f'S3 object(s3://{self.bucket}/{self.key}) is not parquet file'
-        return None
 
     def is_wildcard(self) -> bool:
         return '*' in self.key
@@ -194,8 +185,22 @@ def _get_filepaths(obj: ParquetFile) -> Iterator[List[str]]:
     with ExitStack() as stack:
         ret = []
         for pf in _resolve_wildcard(obj):
-            if pf.skip_reason():
-                print(pf.skip_reason(), file=sys.stderr)
-            else:
-                ret.append(stack.enter_context(pf.get_local_path()))
+            ret.append(stack.enter_context(pf.get_local_path()))
         yield ret
+
+
+def get_concat_dataframe(filenames: List[str]) -> Optional[pd.DataFrame]:
+    '''return concat dataframe from multiple files
+    '''
+    dfs: List[pd.DataFrame] = []
+    for fn in filenames:
+        try:
+            dfs.append(pq.read_table(fn).to_pandas())
+        except pyarrowlib.ArrowInvalid:
+            print(f"File({fn}) cannot be read as parquet.", file=stderr)
+            pass
+
+    if dfs:
+        return reduce(lambda x, y: pd.concat([x, y]), dfs)
+    else:
+        return None

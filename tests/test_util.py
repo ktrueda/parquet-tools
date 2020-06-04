@@ -1,10 +1,10 @@
-from parquet_tools.commands.utils import (
-    LocalParquetFile,
-    S3ParquetFile,
-    get_filepaths_from_objs,
-    InvalidCommandExcpetion,
-    FileNotFoundException)
 import pytest
+from parquet_tools.commands.utils import (FileNotFoundException,
+                                          InvalidCommandExcpetion,
+                                          LocalParquetFile, S3ParquetFile,
+                                          get_concat_dataframe,
+                                          get_filepaths_from_objs)
+import pandas as pd
 
 
 class TestLocalParquetFile:
@@ -126,3 +126,30 @@ class TestGetFilePathsFromObjs:
                 S3ParquetFile(aws_session=aws_session, bucket=bucket, key='not_found.parquet')
             ]) as localfiles:
                 pass
+
+
+class TestGetConcatDataframe:
+
+    def test_concat_all_parquet_file(self):
+        actual: pd.DataFrame = get_concat_dataframe([
+            './tests/test1.parquet',
+            './tests/test2.parquet',
+            './tests/000000_0'
+        ])
+        assert actual is not None
+        assert actual.shape == (3 * 3, 3)
+
+    def test_skip_failed_file(self):
+        actual: pd.DataFrame = get_concat_dataframe([
+            './tests/test1.parquet',
+            './tests/test2.parquet',
+            './tests/test_util.py'  # skip
+        ])
+        assert actual is not None
+        assert actual.shape == (3 * 2, 3)
+
+    def test_all_skip(self):
+        actual: pd.DataFrame = get_concat_dataframe([
+            './tests/test_util.py'  # skip
+        ])
+        assert actual is None

@@ -1,13 +1,12 @@
 import sys
 from argparse import ArgumentParser, Namespace
-from functools import reduce
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
-import pyarrow.parquet as pq
 
 from .utils import (FileNotFoundException, InvalidCommandExcpetion,
-                    ParquetFile, get_filepaths_from_objs, to_parquet_file)
+                    ParquetFile, get_concat_dataframe, get_filepaths_from_objs,
+                    to_parquet_file)
 
 
 def configure_parser(paser: ArgumentParser) -> ArgumentParser:
@@ -57,8 +56,10 @@ def _cli(args: Namespace) -> None:
 
 
 def _execute(filenames: List[str], head: int, columns: list) -> None:
-    df: pd.DataFrame = reduce(lambda x, y: pd.concat([x, y]),
-                              [pq.read_table(fn).to_pandas() for fn in filenames])
+    df: Optional[pd.DataFrame] = get_concat_dataframe(filenames)
+    if df is None:
+        print('cannot open file', file=sys.stderr)
+        return
     # head
     df_head: pd.DataFrame = df.head(head) if head > 0 else df
     # select columns
