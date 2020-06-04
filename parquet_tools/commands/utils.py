@@ -15,6 +15,7 @@ import boto3
 import pandas as pd
 import pyarrow.parquet as pq
 from pyarrow import lib as pyarrowlib
+from halo import Halo
 
 logger = getLogger(__name__)
 
@@ -130,8 +131,10 @@ class S3ParquetFile(ParquetFile):
             localfile = f'{tmp_path}/{uuid4()}.parquet'
             logger.info(f'Download stat parquet file on s3://{self.bucket}/{self.key} -> {localfile}')
             try:
-                self.aws_session.resource('s3')\
-                    .meta.client.download_file(self.bucket, self.key, localfile)
+                with Halo(text='Downloading from s3', spinner='dots', stream=stderr) as spinner:
+                    self.aws_session.resource('s3')\
+                        .meta.client.download_file(self.bucket, self.key, localfile)
+                    spinner.info(f's3://{self.bucket}/{self.key} => {localfile}')
             except Exception:
                 raise FileNotFoundException(f's3://{self.bucket}/{self.key} not found or cannot access')
             else:

@@ -19,6 +19,7 @@ moto = "*"
 [packages]
 wheel = "*"
 twine = "*"
+halo = "*"
 
 [requires]
 python_version = "3.8"

@@ -5,7 +5,7 @@ with open('README.md') as f:
     readme = f.read()
 setup(
     name="parquet_tools",
-    version="0.1.2",
+    version="0.1.3",
     long_description=readme,
     long_description_content_type='text/markdown',
     description='''
@@ -17,7 +17,7 @@ setup(
     author='Kentaro Ueda',
     author_email='kentaro.ueda.kentaro@gmail.com',
     keywords='parquet parquet-tools',
-    install_requires=['pyarrow', 'pandas', 'tabulate', 'boto3'],
+    install_requires=['pyarrow', 'pandas', 'tabulate', 'boto3', 'halo'],
     include_package_data=True,
     entry_points="""
   [console_scripts]
