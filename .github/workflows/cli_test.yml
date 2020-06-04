@@ -4,42 +4,41 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.8
-    - name: Install pipenv and dependencies
-      run: |
-        python -m pip install --upgrade pip
-    - name: Install parquet-tools
-      run: |
-        python -m pip install .
-    - name: Run test[help]
-      run: |
-        parquet-tools --help
-        parquet-tools show --help
-        parquet-tools csv --help
-        parquet-tools inspect --help
-    - name: Run show 
-      run: |
-        parquet-tools show ./tests/test1.parquet
-        parquet-tools show ./tests/*
-        parquet-tools show ./tests/test1.parquet ./tests/test2.parquet
-        parquet-tools show --format github ./tests/test1.parquet
-        parquet-tools show --head 10 ./tests/test1.parquet
-        parquet-tools show --columns one,three ./tests/test1.parquet
-    - name: Run csv
-      run: |
-        parquet-tools csv ./tests/test1.parquet
-        parquet-tools csv ./tests/*
-        parquet-tools csv ./tests/test1.parquet ./tests/test2.parquet
-        parquet-tools csv --head 10 ./tests/test1.parquet
-        parquet-tools csv --columns one,three ./tests/test1.parquet
-    - name: Run inspect
-      run: |
-        parquet-tools inspect ./tests/test1.parquet
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install pipenv and dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Install parquet-tools
+        run: |
+          python -m pip install .
+      - name: Run test[help]
+        run: |
+          parquet-tools --help
+          parquet-tools show --help
+          parquet-tools csv --help
+          parquet-tools inspect --help
+      - name: Run show
+        run: |
+          parquet-tools show ./tests/test1.parquet
+          parquet-tools show ./tests/*
+          parquet-tools show ./tests/test1.parquet ./tests/test2.parquet
+          parquet-tools show --format github ./tests/test1.parquet
+          parquet-tools show --head 10 ./tests/test1.parquet
+          parquet-tools show --columns one,three ./tests/test1.parquet
+      - name: Run csv
+        run: |
+          parquet-tools csv ./tests/test1.parquet
+          parquet-tools csv ./tests/*
+          parquet-tools csv ./tests/test1.parquet ./tests/test2.parquet
+          parquet-tools csv --head 10 ./tests/test1.parquet
+          parquet-tools csv --columns one,three ./tests/test1.parquet
+      - name: Run inspect
+        run: |
+          parquet-tools inspect ./tests/test1.parquet
