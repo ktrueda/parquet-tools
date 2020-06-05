@@ -5,7 +5,7 @@ with open('README.md') as f:
     readme = f.read()
 setup(
     name="parquet_tools",
-    version="0.1.3",
+    version="0.2.0",
     long_description=readme,
     long_description_content_type='text/markdown',
     description='''

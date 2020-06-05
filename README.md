@@ -1,11 +1,11 @@
-# parquet-tools for pip
-
+# parquet-tools
 
 ![Run Unittest](https://github.com/ktrueda/parquet-tools/workflows/Run%20Unittest/badge.svg)
 ![Run CLI test](https://github.com/ktrueda/parquet-tools/workflows/Run%20CLI%20test/badge.svg)
 
-This is a pip version of [parquet-tools](https://github.com/apache/parquet-mr). In other words, this is a CLI tools of [Apache Arrow](https://github.com/apache/arrow).
-You can show parquet file content/shema on local disk or on AWS S3.
+This is a pip installable [parquet-tools](https://github.com/apache/parquet-mr).
+In other words, parquet-tools is a CLI tools of [Apache Arrow](https://github.com/apache/arrow) or easy install [parquet-tools](https://github.com/apache/parquet-mr).
+You can show parquet file content/schema on local disk or on Amazon S3.
 
 ## Features
 
@@ -13,7 +13,6 @@ You can show parquet file content/shema on local disk or on AWS S3.
 - Read Parquet metadata/schema (local file or file on S3)
 
 ## Installation
-
 
 ```bash
 $ pip install parquet-tools
@@ -36,7 +35,6 @@ positional arguments:
 optional arguments:
   -h, --help          show this help message and exit
 ```
-
 
 ## Usage Examples
 
@@ -66,7 +64,7 @@ $ parquet-tools show s3://bucket-name/prefix/*
 +-------+-------+---------+
 ```
 
-#### Cat CSV parquet and [csvq](https://github.com/mithrandie/csvq)
+#### Cat CSV parquet and transform [csvq](https://github.com/mithrandie/csvq)
 
 ```bash
 $ parquet-tools csv s3://bucket-name/test.parquet |csvq "select one, three where three"
