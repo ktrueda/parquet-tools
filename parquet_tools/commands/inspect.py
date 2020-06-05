@@ -8,7 +8,8 @@ from .utils import(
     ParquetFile,
     to_parquet_file,
     S3ParquetFile,
-    get_filepaths_from_objs
+    get_datafame_from_objs,
+    FileNotFoundException
 )
 
 
@@ -35,13 +36,16 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
 
 def _cli(args: Namespace) -> None:
     pf: ParquetFile = to_parquet_file(file_exp=args.file, awsprofile=args.awsprofile)
-    with get_filepaths_from_objs([pf]) as localfiles:
-        if len(localfiles) > 1:
-            print('Cannot inspect more than 1 files', file=sys.stderr)
-        else:
-            _execute(
-                filename=localfiles[0],
-            )
+    if pf.is_wildcard():
+        print('Cannot use wildcard for inspection.', file=sys.stderr)
+    else:
+        try:
+            with pf.get_local_path() as local_path:
+                _execute(
+                    filename=local_path,
+                )
+        except FileNotFoundException as e:
+            print(str(e), file=sys.stderr)
 
 
 def _execute(filename: str) -> None:

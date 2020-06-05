@@ -2,8 +2,8 @@ import pytest
 from parquet_tools.commands.utils import (FileNotFoundException,
                                           InvalidCommandExcpetion,
                                           LocalParquetFile, S3ParquetFile,
-                                          get_concat_dataframe,
-                                          get_filepaths_from_objs)
+                                          _resolve_wildcard,
+                                          get_datafame_from_objs)
 import pandas as pd
 
 
@@ -68,88 +68,139 @@ class TestS3ParquetFile:
             assert localfiles.endswith('.parquet')
 
 
-class TestGetFilePathsFromObjs:
+class TestResolveWildcard:
     def test_single_localfile(self):
-        with get_filepaths_from_objs([
+        actual = _resolve_wildcard(
             LocalParquetFile(path='./tests/test1.parquet')
-        ]) as localfiles:
-            assert localfiles == ['./tests/test1.parquet']
+        )
+
+        assert len(actual) == 1
+        assert actual[0].path == './tests/test1.parquet'
 
     def test_multiple_localfile(self):
-        with get_filepaths_from_objs([
-            LocalParquetFile(path='./tests/test1.parquet'),
+        actual = _resolve_wildcard(
             LocalParquetFile(path='./tests/*.parquet'),
-        ]) as localfiles:
-            assert localfiles == [
-                './tests/test1.parquet',
-                './tests/test1.parquet',
-                './tests/test2.parquet',
-            ]
+        )
+
+        assert len(actual) == 2
+        assert isinstance(actual[0], LocalParquetFile)
+        assert isinstance(actual[1], LocalParquetFile)
+
+        assert {a.path for a in actual} == {
+            './tests/test1.parquet',
+            './tests/test2.parquet',
+        }
 
     def test_concrete_local_not_found(self):
-        with pytest.raises(FileNotFoundException):
-            with get_filepaths_from_objs([
-                LocalParquetFile(path='not_found.parquet'),
-            ]) as localfiles:
-                pass
+        assert _resolve_wildcard(
+            LocalParquetFile(path='not_found.parquet'),
+        ) == [
+            LocalParquetFile(path='not_found.parquet'),
+        ]
 
     def test_wildcard_local_not_found(self):
-        with get_filepaths_from_objs([
+        assert _resolve_wildcard(
             LocalParquetFile(path='not_found*'),
-        ]) as localfiles:
-            assert len(localfiles) == 0
+        ) == []
 
     def test_single_s3file(self, aws_session, parquet_file_s3_1):
         bucket, key = parquet_file_s3_1
-        with get_filepaths_from_objs([
+        actual = _resolve_wildcard(
             S3ParquetFile(aws_session=aws_session, bucket=bucket, key=key)
-        ]) as localfiles:
-            assert len(localfiles) == 1
-            assert localfiles[0].endswith('.parquet')
-
-    def test_multiple_s3file(self, aws_session, parquet_file_s3_1, parquet_file_s3_2):
-        bucket_1, key_1 = parquet_file_s3_1
-        bucket_2, key_2 = parquet_file_s3_2
-        with get_filepaths_from_objs([
-            S3ParquetFile(aws_session=aws_session, bucket=bucket_1, key=key_1),
-            S3ParquetFile(aws_session=aws_session, bucket=bucket_2, key=key_2),
-        ]) as localfiles:
-            assert len(localfiles) == 2
-            assert localfiles[0].endswith('.parquet')
-            assert localfiles[1].endswith('.parquet')
-            assert localfiles[0] != localfiles[1]
+        )
+        assert len(actual) == 1
+        assert isinstance(actual[0], S3ParquetFile)
+        assert actual[0].key.endswith('.parquet')
 
     def test_s3_not_found(self, aws_session, parquet_file_s3_1):
         bucket, _ = parquet_file_s3_1
-        with pytest.raises(FileNotFoundException):
-            with get_filepaths_from_objs([
-                S3ParquetFile(aws_session=aws_session, bucket=bucket, key='not_found.parquet')
-            ]) as localfiles:
-                pass
+        assert _resolve_wildcard(
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key='not_found.parquet')
+        ) == [
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key='not_found.parquet')
+        ]
+
+    def test_wildcard_s3_not_found(self, aws_session, parquet_file_s3_1):
+        bucket, _ = parquet_file_s3_1
+        assert _resolve_wildcard(
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key='not_found*')
+        ) == []
 
 
-class TestGetConcatDataframe:
+class TestGetDataframeFromObjs:
 
-    def test_concat_all_parquet_file(self):
-        actual: pd.DataFrame = get_concat_dataframe([
-            './tests/test1.parquet',
-            './tests/test2.parquet',
-            './tests/000000_0'
-        ])
-        assert actual is not None
-        assert actual.shape == (3 * 3, 3)
+    def test_local_single_file(self):
+        with get_datafame_from_objs([
+            LocalParquetFile(path='./tests/test1.parquet')
+        ]) as df:
 
-    def test_skip_failed_file(self):
-        actual: pd.DataFrame = get_concat_dataframe([
-            './tests/test1.parquet',
-            './tests/test2.parquet',
-            './tests/test_util.py'  # skip
-        ])
-        assert actual is not None
-        assert actual.shape == (3 * 2, 3)
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3
 
-    def test_all_skip(self):
-        actual: pd.DataFrame = get_concat_dataframe([
-            './tests/test_util.py'  # skip
-        ])
-        assert actual is None
+    def test_local_double_file(self):
+        with get_datafame_from_objs([
+            LocalParquetFile(path='./tests/test1.parquet'),
+            LocalParquetFile(path='./tests/test2.parquet')
+        ]) as df:
+
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * 2
+
+    def test_local_wildcard(self):
+        with get_datafame_from_objs([
+            LocalParquetFile(path='./tests/*'),
+        ]) as df:
+
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * 3
+
+    def test_s3_single_file(self, aws_session, parquet_file_s3_1):
+        bucket, key = parquet_file_s3_1
+        with get_datafame_from_objs([
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key=key)
+        ]) as df:
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * 1
+
+    def test_s3_double_file(self, aws_session, parquet_file_s3_1, parquet_file_s3_2):
+        bucket_1, key_1 = parquet_file_s3_1
+        bucket_2, key_2 = parquet_file_s3_2
+        with get_datafame_from_objs([
+            S3ParquetFile(aws_session=aws_session, bucket=bucket_1, key=key_1),
+            S3ParquetFile(aws_session=aws_session, bucket=bucket_2, key=key_2)
+        ]) as df:
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * 2
+
+    def test_s3_wildcard_file(self, aws_session, parquet_file_s3_1, parquet_file_s3_2):
+        bucket, _ = parquet_file_s3_1
+        with get_datafame_from_objs([
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key='*'),
+        ]) as df:
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * 2
+
+    def test_local_and_s3_files(self, aws_session, parquet_file_s3_1):
+        bucket, key = parquet_file_s3_1
+        with get_datafame_from_objs([
+            LocalParquetFile(path='./tests/test1.parquet'),
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key=key)
+        ]) as df:
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * 2
+
+    def test_local_and_s3_wildcard_files(self, aws_session, parquet_file_s3_1, parquet_file_s3_2):
+        bucket, _ = parquet_file_s3_1
+        with get_datafame_from_objs([
+            LocalParquetFile(path='./tests/*'),  # hit local 3 files
+            S3ParquetFile(aws_session=aws_session, bucket=bucket, key='*')  # hit 2 files on s3
+        ]) as df:
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3 * (3 + 2)
+
+    def test_head_early_stopping(self):
+        with get_datafame_from_objs([
+            LocalParquetFile(path='./tests/*'),
+        ], head=2) as df:
+            assert isinstance(df, pd.core.frame.DataFrame)
+            assert len(df) == 3

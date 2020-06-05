@@ -7,7 +7,7 @@ import pandas as pd
 from tabulate import tabulate
 
 from .utils import (FileNotFoundException, InvalidCommandExcpetion,
-                    ParquetFile, get_concat_dataframe, get_filepaths_from_objs,
+                    ParquetFile, get_datafame_from_objs,
                     to_parquet_file)
 
 logger = getLogger(__name__)
@@ -57,12 +57,11 @@ def _cli(args: Namespace) -> None:
         pfs: List[ParquetFile] = [
             to_parquet_file(file_exp=f, awsprofile=args.awsprofile)
             for f in args.file]
-
-        with get_filepaths_from_objs(pfs) as localfiles:
-            if len(localfiles) == 0:
+        with get_datafame_from_objs(pfs, args.head) as df:
+            if df is None:
                 raise FileNotFoundException('File matching that expression not found.')
             _execute(
-                filenames=localfiles,
+                df=df,
                 format=args.format,
                 head=args.head,
                 columns=args.columns
@@ -73,11 +72,7 @@ def _cli(args: Namespace) -> None:
         print(str(e), file=sys.stderr)
 
 
-def _execute(filenames: List[str], format: str, head: int, columns: list) -> None:
-    df: Optional[pd.DataFrame] = get_concat_dataframe(filenames)
-    if df is None:
-        print('cannot open file', file=sys.stderr)
-        return
+def _execute(df: pd.DataFrame, format: str, head: int, columns: list) -> None:
     # head
     df_head: pd.DataFrame = df.head(head) if head > 0 else df
     # select columns

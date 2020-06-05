@@ -70,7 +70,11 @@ def test_configure_parser(parser, arg, valid, exptected):
 
 def test_excute(capfd, parquet_file):
     _execute(
-        filenames=[parquet_file],
+        df=pd.DataFrame(
+            {'one': [-1, np.nan, 2.5],
+             'two': ['foo', 'bar', 'baz'],
+             'three': [True, False, True]}
+        ),
         head=-1,
         columns=[]
     )

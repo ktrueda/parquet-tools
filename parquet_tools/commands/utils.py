@@ -7,7 +7,7 @@ from logging import getLogger
 from pathlib import Path
 from sys import stderr
 from tempfile import TemporaryDirectory
-from typing import Iterator, List, Optional
+from typing import Iterator, List, Optional, Union
 from urllib.parse import urlparse
 from uuid import uuid4
 
@@ -63,6 +63,15 @@ class ParquetFile(ABC):
         If call this function of S3ParquetFile, return the path of downloaded file.
         '''
         raise NotImplementedError()
+
+    @contextmanager
+    def get_dataframe(self) -> pd.DataFrame:
+        with self.get_local_path() as local_path:
+            try:
+                yield pq.read_table(local_path).to_pandas()
+            except pyarrowlib.ArrowInvalid:
+                print(f"File({local_path}) cannot be read as parquet.", file=stderr)
+                yield None
 
 
 @dataclass
@@ -166,14 +175,32 @@ def to_parquet_file(file_exp: str, awsprofile: str) -> ParquetFile:
 
 
 @contextmanager
-def get_filepaths_from_objs(objs: List[ParquetFile]):
-    '''Get list of local file pathes of ParquetFile object list.
+def get_datafame_from_objs(objs: List[ParquetFile], head: Union[int, float] = None):
+    '''Get pandas dataframe of ParquetFile object list.
     '''
+
+    if head is None or head <= 0:
+        head = float('inf')
+
+    cumsum_row: int = 0
+    dfs: List[pd.DataFrame] = []
     with ExitStack() as stack:
-        yield sum([
-            stack.enter_context(_get_filepaths(obj))
-            for obj in objs
-        ], [])
+        for obj in objs:
+            for pf in _resolve_wildcard(obj):
+                df: Optional[pd.DataFrame] = stack.enter_context(pf.get_dataframe())
+                if df is None:
+                    continue
+                cumsum_row += len(df)
+                dfs.append(df)
+
+                if cumsum_row >= head:
+                    break
+            if cumsum_row >= head:
+                break
+        if dfs:
+            yield reduce(lambda x, y: pd.concat([x, y]), dfs)
+        else:
+            yield None
 
 
 def _resolve_wildcard(obj: ParquetFile) -> List[ParquetFile]:
@@ -181,29 +208,3 @@ def _resolve_wildcard(obj: ParquetFile) -> List[ParquetFile]:
         return [obj]
     else:
         return obj.resolve_wildcard()
-
-
-@contextmanager
-def _get_filepaths(obj: ParquetFile) -> Iterator[List[str]]:
-    with ExitStack() as stack:
-        ret = []
-        for pf in _resolve_wildcard(obj):
-            ret.append(stack.enter_context(pf.get_local_path()))
-        yield ret
-
-
-def get_concat_dataframe(filenames: List[str]) -> Optional[pd.DataFrame]:
-    '''return concat dataframe from multiple files
-    '''
-    dfs: List[pd.DataFrame] = []
-    for fn in filenames:
-        try:
-            dfs.append(pq.read_table(fn).to_pandas())
-        except pyarrowlib.ArrowInvalid:
-            print(f"File({fn}) cannot be read as parquet.", file=stderr)
-            pass
-
-    if dfs:
-        return reduce(lambda x, y: pd.concat([x, y]), dfs)
-    else:
-        return None
