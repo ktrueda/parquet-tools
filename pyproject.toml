@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "parquet_tools"
+version = "0.2.0"
+description = "Easy install parquet-tools"
+authors = ["Kentaro Ueda <kentaro.ueda.kentaro@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/ktrueda/parquet-tools"
+homepage = "https://github.com/ktrueda/parquet-tools"
+keywords = ["parquet-tools", "parquet"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+wheel = "^0.34.2"
+twine = "^3.1.1"
+halo = "^0.0.29"
+pyarrow = "^0.17.1"
+pandas = "^1.0.4"
+tabulate = "^0.8.7"
+boto3 = "^1.13.25"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "^1.5.3"
+flake8 = "^3.8.3"
+mypy = "^0.780"
+pylint = "^2.5.3"
+pytest = "^5.4.3"
+pytest-mock = "^3.1.1"
+moto = "^1.3.14"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry.scripts]
+parquet-tools = "parquet_tools.cli:main"
