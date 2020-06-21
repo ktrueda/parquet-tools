@@ -4,7 +4,7 @@
 ![Run CLI test](https://github.com/ktrueda/parquet-tools/workflows/Run%20CLI%20test/badge.svg)
 
 This is a pip installable [parquet-tools](https://github.com/apache/parquet-mr).
-In other words, parquet-tools is a CLI tools of [Apache Arrow](https://github.com/apache/arrow) or easy install [parquet-tools](https://github.com/apache/parquet-mr).
+In other words, parquet-tools is a CLI tools of [Apache Arrow](https://github.com/apache/arrow).
 You can show parquet file content/schema on local disk or on Amazon S3.
 
 ## Features
@@ -62,6 +62,25 @@ $ parquet-tools show s3://bucket-name/prefix/*
 | nan   | bar   | False   |
 |   2.5 | baz   | True    |
 +-------+-------+---------+
+```
+
+
+#### Inspect parquet file schema
+
+```bash
+FileMetaData
+■■■■version = 1
+■■■■schema = list
+...
+■■■■column_orders = list
+■■■■■■■■ColumnOrder
+■■■■■■■■■■■■TYPE_ORDER = TypeDefinedOrder
+■■■■■■■■ColumnOrder
+■■■■■■■■■■■■TYPE_ORDER = TypeDefinedOrder
+■■■■■■■■ColumnOrder
+■■■■■■■■■■■■TYPE_ORDER = TypeDefinedOrder
+■■■■■■■■ColumnOrder
+■■■■■■■■■■■■TYPE_ORDER = TypeDefinedOrder
 ```
 
 #### Cat CSV parquet and transform [csvq](https://github.com/mithrandie/csvq)
