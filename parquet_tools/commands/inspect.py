@@ -1,16 +1,11 @@
-from argparse import ArgumentParser, Namespace
-from typing import List
 import sys
+from argparse import ArgumentParser, Namespace
 
-import pyarrow.parquet as pq
+from colorama import Fore, Style
 
-from .utils import(
-    ParquetFile,
-    to_parquet_file,
-    S3ParquetFile,
-    get_datafame_from_objs,
-    FileNotFoundException
-)
+from parquet_tools.parquet.reader import get_filemetadata
+
+from .utils import FileNotFoundException, ParquetFile, to_parquet_file
 
 
 def dedent(text: str) -> str:
@@ -49,44 +44,37 @@ def _cli(args: Namespace) -> None:
 
 
 def _execute(filename: str) -> None:
-    pq_file: pq.ParquetFile = pq.ParquetFile(filename)
-    file_meta: pq.FileMetaData = pq_file.metadata
-    print(_file_meta_expression(file_meta))
-    file_schema: pq.ParquetSchema = pq_file.schema
-    print(_schema_expression(file_schema))
+    print(_obj_to_string(get_filemetadata(filename)))
 
 
-def _file_meta_expression(file_meta: pq.FileMetaData) -> str:
-    return dedent(f'''
-    ############ file meta data ############
-    created_by: {file_meta.created_by}
-    num_columns: {file_meta.num_columns}
-    num_rows: {file_meta.num_rows}
-    num_row_groups: {file_meta.num_row_groups}
-    format_version: {file_meta.format_version}
-    serialized_size: {file_meta.serialized_size}
-    ''')
+def _obj_to_string(obj, level: int = 1) -> str:
+    color = [
+        Fore.RED,
+        Fore.YELLOW,
+        Fore.GREEN,
+        Fore.BLUE
+    ]
 
-
-def _schema_expression(schema) -> str:
-    columns: List[str] = schema.names
-    columns_exp = '\n'.join(columns)
-
-    exp = dedent(f'''
-    ############ Columns ############
-    {columns_exp}
-    ''')
-    for i, column in enumerate(columns):
-        col = schema.column(i)
-        exp += dedent(f'''
-        ############ Column({column}) ############
-        name: {col.name}
-        path: {col.path}
-        max_definition_level: {col.max_definition_level}
-        max_repetition_level: {col.max_repetition_level}
-        physical_type: {col.physical_type}
-        logical_type: {col.logical_type}
-        converted_type (legacy): {col.converted_type}
-        ''')
-
-    return exp
+    extra = ''
+    for i in range(level):
+        extra += color[i % 4] + '■■■■' + Style.RESET_ALL
+    ret = ''
+    if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, bytes):
+        ret += str(obj)[:50]
+    else:
+        ret += str(obj.__class__.__name__)
+        ret += '\n'
+        if isinstance(obj, list):
+            for e in obj:
+                add = extra + _obj_to_string(e, level + 1)
+                if add:
+                    ret += add + '\n'
+            ret = ret[:-1]
+        else:
+            for item in obj.__dict__:
+                if obj.__dict__[item]:
+                    ret += extra
+                    ret += str(item) + ' = ' + _obj_to_string(obj.__dict__[item], level + 1)
+                    ret += '\n'
+            ret = ret[:-1]
+    return ret

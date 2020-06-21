@@ -16,6 +16,8 @@ pyarrow = "^0.17.1"
 pandas = "^1.0.4"
 tabulate = "^0.8.7"
 boto3 = "^1.13.25"
+thrift = "^0.13.0"
+colorama = "^0.4.3"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.5.3"
@@ -28,9 +30,9 @@ moto = "^1.3.14"
 wheel = "^0.34.2"
 twine = "^3.1.1"
 
+[tool.poetry.scripts]
+parquet-tools = "parquet_tools.cli:main"
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
 
-[tool.poetry.scripts]
-parquet-tools = "parquet_tools.cli:main"
