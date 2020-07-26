@@ -4378,7 +4378,6 @@ class FileMetaData(object):
         iprot.readStructBegin()
         while True:
             (fname, ftype, fid) = iprot.readFieldBegin()
-            print('debug', fname, ftype, fid)
             if ftype == TType.STOP:
                 break
             if fid == 1:
