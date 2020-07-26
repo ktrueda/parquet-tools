@@ -1,6 +1,5 @@
-.venv
-.mypy_cache
-.pytest_cache
+*.pyc
 __pycache__
-.DS_Store
-.vscode
+*.egg-info
+.venv
+dist
