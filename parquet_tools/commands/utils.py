@@ -150,7 +150,7 @@ class S3ParquetFile(ParquetFile):
                 yield localfile
 
 
-def get_aws_session(profile_name: str='default') -> boto3.Session:
+def get_aws_session(profile_name: Optional[str]) -> boto3.Session:
     return boto3.Session(profile_name=profile_name)
 
 
@@ -158,7 +158,7 @@ def _is_s3_file(filename: str) -> bool:
     return filename[:5] == 's3://'
 
 
-def to_parquet_file(file_exp: str, awsprofile: str) -> ParquetFile:
+def to_parquet_file(file_exp: str, awsprofile: Optional[str]) -> ParquetFile:
     '''Transform file_exp to ParquetFile object.
     '''
     if _is_s3_file(file_exp):

@@ -22,7 +22,7 @@ def parser():
             'file': ['file1.parquet'],
             'format': 'psql',
             'head': -1,
-            'awsprofile': 'default'
+            'awsprofile': None
         }
     ),
     # most complex one
@@ -33,7 +33,7 @@ def parser():
             'file': ['file1.parquet', 'file2.parquet'],
             'format': 'github',
             'head': 100,
-            'awsprofile': 'default'
+            'awsprofile': None
         }
     ),
     # file is on S3

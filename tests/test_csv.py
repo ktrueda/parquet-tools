@@ -36,7 +36,7 @@ def parquet_file():
             'columns': [],
             'file': ['file1.parquet'],
             'head': -1,
-            'awsprofile': 'default'
+            'awsprofile': None
         }
     ),
     # most complex one
