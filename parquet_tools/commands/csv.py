@@ -30,7 +30,6 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
     paser.add_argument('--awsprofile',
                        type=str,
                        required=False,
-                       default='default',
                        help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
     paser.set_defaults(handler=_cli)
     return paser
