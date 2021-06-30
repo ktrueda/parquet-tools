@@ -24,11 +24,11 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
                        type=str,
                        required=False,
                        help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
-    paser.add_argument('--simple',
+    paser.add_argument('--detail',
                        action='store_true',
                        required=False,
                        default=False,
-                       help='Simple expression.')
+                       help='Detail expression using thrift.')
 
     paser.set_defaults(handler=_cli)
     return paser
@@ -41,12 +41,12 @@ def _cli(args: Namespace) -> None:
     else:
         try:
             with pf.get_local_path() as local_path:
-                if args.simple:
-                    _execute_simple(
+                if args.detail:
+                    _execute_detail(
                         filename=local_path,
                     )
                 else:
-                    _execute_detail(
+                    _execute_simple(
                         filename=local_path,
                     )
         except FileNotFoundException as e:
