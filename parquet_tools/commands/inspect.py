@@ -1,8 +1,9 @@
 import sys
 from argparse import ArgumentParser, Namespace
+from typing import List
 
+import pyarrow.parquet as pq
 from colorama import Fore, Style
-
 from parquet_tools.parquet.reader import get_filemetadata
 
 from .utils import FileNotFoundException, ParquetFile, to_parquet_file
@@ -23,6 +24,11 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
                        type=str,
                        required=False,
                        help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
+    paser.add_argument('--simple',
+                       type=bool,
+                       required=False,
+                       default=False,
+                       help='Simple expression.')
 
     paser.set_defaults(handler=_cli)
     return paser
@@ -35,14 +41,63 @@ def _cli(args: Namespace) -> None:
     else:
         try:
             with pf.get_local_path() as local_path:
-                _execute(
-                    filename=local_path,
-                )
+                if args.simple:
+                    _execute_simple(
+                        filename=local_path,
+                    )
+                else:
+                    _execute_detail(
+                        filename=local_path,
+                    )
         except FileNotFoundException as e:
             print(str(e), file=sys.stderr)
 
 
-def _execute(filename: str) -> None:
+def _execute_simple(filename: str) -> None:
+    pq_file: pq.ParquetFile = pq.ParquetFile(filename)
+    file_meta: pq.FileMetaData = pq_file.metadata
+    print(_simple_meta_expression(file_meta))
+    file_schema: pq.ParquetSchema = pq_file.schema
+    print(_simple_schema_expression(file_schema))
+
+
+def _simple_meta_expression(file_meta: pq.FileMetaData) -> str:
+    return dedent(f'''
+    ############ file meta data ############
+    created_by: {file_meta.created_by}
+    num_columns: {file_meta.num_columns}
+    num_rows: {file_meta.num_rows}
+    num_row_groups: {file_meta.num_row_groups}
+    format_version: {file_meta.format_version}
+    serialized_size: {file_meta.serialized_size}
+    ''')
+
+
+def _simple_schema_expression(schema) -> str:
+    columns: List[str] = schema.names
+    columns_exp = '\n'.join(columns)
+
+    exp = dedent(f'''
+    ############ Columns ############
+    {columns_exp}
+    ''')
+    for i, column in enumerate(columns):
+        col = schema.column(i)
+        exp += dedent(f'''
+        ############ Column({column}) ############
+        name: {col.name}
+        path: {col.path}
+        max_definition_level: {col.max_definition_level}
+        max_repetition_level: {col.max_repetition_level}
+        physical_type: {col.physical_type}
+        logical_type: {col.logical_type}
+        converted_type (legacy): {col.converted_type}
+        ''')
+
+    return exp
+
+
+def _execute_detail(filename: str) -> None:
     print(_obj_to_string(get_filemetadata(filename)))
 
 
