@@ -25,7 +25,7 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
                        required=False,
                        help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
     paser.add_argument('--simple',
-                       type=bool,
+                       action='store_true',
                        required=False,
                        default=False,
                        help='Simple expression.')
