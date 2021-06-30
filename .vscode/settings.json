@@ -14,5 +14,6 @@
     "--ignore=E402,E501,E722,E252,W504,W605"
   ],
   "python.linting.mypyEnabled": true,
-  "python.linting.mypyPath": ".venv/bin/mypy"
+  "python.linting.mypyPath": ".venv/bin/mypy",
+  "editor.defaultFormatter": "ms-python.python"
 }
