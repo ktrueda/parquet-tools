@@ -44,3 +44,4 @@ jobs:
       - name: Run inspect
         run: |
           parquet-tools inspect ./tests/test1.parquet
+          parquet-tools inspect --detail ./tests/test1.parquet
