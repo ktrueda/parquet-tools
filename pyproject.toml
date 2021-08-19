@@ -8,6 +8,7 @@ readme = "README.md"
 repository = "https://github.com/ktrueda/parquet-tools"
 homepage = "https://github.com/ktrueda/parquet-tools"
 keywords = ["parquet-tools", "parquet"]
+exclude = ["parquet_tools/parquet.thrift", "parquet_tools/README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
