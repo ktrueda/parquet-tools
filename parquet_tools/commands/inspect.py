@@ -98,10 +98,10 @@ def _simple_schema_expression(schema) -> str:
 
 
 def _execute_detail(filename: str) -> None:
-    print(_obj_to_string(get_filemetadata(filename)))
+    print(_obj_to_string(get_filemetadata(filename), sys.stdout.isatty()))
 
 
-def _obj_to_string(obj, level: int = 1) -> str:
+def _obj_to_string(obj, toatty: bool, level: int = 1) -> str:
     color = [
         Fore.RED,
         Fore.YELLOW,
@@ -111,7 +111,7 @@ def _obj_to_string(obj, level: int = 1) -> str:
 
     extra = ''
     for i in range(level):
-        extra += color[i % 4] + '■■■■' + Style.RESET_ALL
+        extra += color[i % 4] + '■■■■' + Style.RESET_ALL if toatty else '    '
     ret = ''
     if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, bytes):
         ret += str(obj)[:50]
@@ -120,7 +120,7 @@ def _obj_to_string(obj, level: int = 1) -> str:
         ret += '\n'
         if isinstance(obj, list):
             for e in obj:
-                add = extra + _obj_to_string(e, level + 1)
+                add = extra + _obj_to_string(e, toatty, level + 1)
                 if add:
                     ret += add + '\n'
             ret = ret[:-1]
@@ -128,7 +128,7 @@ def _obj_to_string(obj, level: int = 1) -> str:
             for item in obj.__dict__:
                 if obj.__dict__[item]:
                     ret += extra
-                    ret += str(item) + ' = ' + _obj_to_string(obj.__dict__[item], level + 1)
+                    ret += str(item) + ' = ' + _obj_to_string(obj.__dict__[item], toatty, level + 1)
                     ret += '\n'
             ret = ret[:-1]
     return ret
