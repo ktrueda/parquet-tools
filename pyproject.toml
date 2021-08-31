@@ -13,10 +13,10 @@ exclude = ["parquet_tools/parquet.thrift", "parquet_tools/README.md"]
 [tool.poetry.dependencies]
 python = "^3.8"
 halo = "^0.0.29"
-pyarrow = "^0.17.1"
-pandas = "^1.0.4"
+pyarrow = "*"
+pandas = "^1"
 tabulate = "^0.8.7"
-boto3 = "^1.13.25"
+boto3 = "^1.13"
 thrift = "^0.13.0"
 colorama = "^0.4.3"
 
@@ -27,7 +27,7 @@ mypy = "^0.780"
 pylint = "^2.5.3"
 pytest = "^5.4.3"
 pytest-mock = "^3.1.1"
-moto = "^1.3.14"
+moto = "*"
 wheel = "^0.34.2"
 twine = "^3.1.1"
 
