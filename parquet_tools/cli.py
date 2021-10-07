@@ -11,7 +11,7 @@ def main() -> None:
     show.configure_parser(subparsers.add_parser(
         'show',
         help='Show human readable format. see `show -h`',
-        description='Show parquet file content with human readablity.'))
+        description='Show parquet file content with human readability.'))
     csv.configure_parser(subparsers.add_parser(
         'csv',
         help='Cat csv style. see `csv -h`',
