@@ -75,5 +75,5 @@ def _execute(df: pd.DataFrame, format: str, head: int, columns: list) -> None:
     # head
     df_head: pd.DataFrame = df.head(head) if head > 0 else df
     # select columns
-    df_select: pd.DataFrame = df[columns] if len(columns) else df_head
+    df_select: pd.DataFrame = df_head[columns] if len(columns) else df_head
     print(tabulate(df_select, df_select.columns, tablefmt=format, showindex=False))

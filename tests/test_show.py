@@ -79,9 +79,13 @@ def test_excute(capfd, parquet_file):
              'three': [True, False, True]}
         ),
         format='psql',
-        head=-1,
-        columns=[]
+        head=2,
+        columns=['one', 'three']
     )
     out, err = capfd.readouterr()
+
     assert out is not None
     assert err == ''
+    assert 'foo' not in out, 'Column two should not be output'
+    assert '2.5' not in out, 'Row 3 should not be output'
+
