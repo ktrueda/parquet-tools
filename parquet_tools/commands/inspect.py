@@ -58,7 +58,7 @@ def _execute_simple(filename: str) -> None:
     file_meta: pq.FileMetaData = pq_file.metadata
     print(_simple_meta_expression(file_meta))
     file_schema: pq.ParquetSchema = pq_file.schema
-    print(_simple_schema_expression(file_schema))
+    print(_simple_schema_expression(file_meta, file_schema))
 
 
 def _simple_meta_expression(file_meta: pq.FileMetaData) -> str:
@@ -73,7 +73,7 @@ def _simple_meta_expression(file_meta: pq.FileMetaData) -> str:
     ''')
 
 
-def _simple_schema_expression(schema) -> str:
+def _simple_schema_expression(file_meta, schema) -> str:
     columns: List[str] = schema.names
     columns_exp = '\n'.join(columns)
 
@@ -83,6 +83,9 @@ def _simple_schema_expression(schema) -> str:
     ''')
     for i, column in enumerate(columns):
         col = schema.column(i)
+        col_meta = file_meta.row_group(0).column(i)
+        col_compression_space_saving_ratio = 1 - (col_meta.total_compressed_size / col_meta.total_uncompressed_size)
+        col_compression = f"{col_meta.compression} (space_saved: {col_compression_space_saving_ratio*100:.0f}%)"
         exp += dedent(f'''
         ############ Column({column}) ############
         name: {col.name}
@@ -92,6 +95,7 @@ def _simple_schema_expression(schema) -> str:
         physical_type: {col.physical_type}
         logical_type: {col.logical_type}
         converted_type (legacy): {col.converted_type}
+        compression: {col_compression}
         ''')
 
     return exp

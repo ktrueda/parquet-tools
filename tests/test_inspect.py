@@ -57,6 +57,7 @@ max_repetition_level: 0
 physical_type: DOUBLE
 logical_type: None
 converted_type (legacy): NONE
+compression: SNAPPY (space_saved: -4%)
 
 ############ Column(two) ############
 name: two
@@ -66,6 +67,7 @@ max_repetition_level: 0
 physical_type: BYTE_ARRAY
 logical_type: String
 converted_type (legacy): UTF8
+compression: SNAPPY (space_saved: -5%)
 
 ############ Column(three) ############
 name: three
@@ -75,5 +77,6 @@ max_repetition_level: 0
 physical_type: BOOLEAN
 logical_type: None
 converted_type (legacy): NONE
+compression: SNAPPY (space_saved: -5%)
 
 '''
