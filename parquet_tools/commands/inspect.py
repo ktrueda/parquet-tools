@@ -114,7 +114,7 @@ def _obj_to_string(obj, toatty: bool, level: int = 1) -> str:
         extra += color[i % 4] + '■■■■' + Style.RESET_ALL if toatty else '    '
     ret = ''
     if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, bytes):
-        ret += str(obj)[:50]
+        ret += str(obj)
     else:
         ret += str(obj.__class__.__name__)
         ret += '\n'
