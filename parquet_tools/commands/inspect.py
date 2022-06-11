@@ -59,8 +59,7 @@ def _execute_simple(filename: str) -> None:
     print(_simple_meta_expression(file_meta))
     file_schema: pq.ParquetSchema = pq_file.schema
     print(_simple_schema_expression(file_schema))
-    file_schema_meta: dict = pq_file.schema_arrow.metadata
-    print(_simple_schema_meta_expression(file_schema_meta))
+
 
 def _simple_meta_expression(file_meta: pq.FileMetaData) -> str:
     return dedent(f'''
@@ -96,19 +95,6 @@ def _simple_schema_expression(schema) -> str:
         ''')
 
     return exp
-
-
-def _simple_schema_meta_expression(schema_meta) -> str:
-    exp = dedent(f'''
-    ############ file schema meta data ############
-    ''')
-    decoded_schema_meta = ""
-    for key, value in schema_meta.items():
-        decoded_schema_meta += f'''
-        {key.decode("utf-8")}: {value.decode("utf-8")}
-        '''
-
-    return exp + dedent(decoded_schema_meta)
 
 
 def _execute_detail(filename: str) -> None:
