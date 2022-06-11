@@ -62,7 +62,6 @@ def _execute_simple(filename: str) -> None:
     file_schema_meta: dict = pq_file.schema_arrow.metadata
     print(_simple_schema_meta_expression(file_schema_meta))
 
-
 def _simple_meta_expression(file_meta: pq.FileMetaData) -> str:
     return dedent(f'''
     ############ file meta data ############
