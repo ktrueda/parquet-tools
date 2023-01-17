@@ -129,7 +129,7 @@ class S3ParquetFile(ParquetFile):
             return []
         keys = [e['Key'] for e in list_res['Contents']]
         return sorted(
-            [S3ParquetFile(aws_session=self.aws_session, bucket=self.bucket, key=key) for key in keys],
+            [S3ParquetFile(aws_session=self.aws_session, bucket=self.bucket, key=key, endpoint_url=self.endpoint_url) for key in keys],
             key=lambda x: x.key
         )
 
