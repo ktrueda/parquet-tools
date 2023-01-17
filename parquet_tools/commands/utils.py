@@ -105,7 +105,7 @@ class S3ParquetFile(ParquetFile):
     aws_session: boto3.Session
     bucket: str
     key: str
-    endpoint_url: str
+    endpoint_url: Optional[str] = None
 
     def validation(self):
         ''' key can have *. But it must be last of the string.
