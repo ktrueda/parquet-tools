@@ -46,6 +46,11 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
                        type=str,
                        required=False,
                        help='awscli profile in ~/.aws/credentials. You use this option when you read parquet file on s3.')
+    paser.add_argument('--endpoint-url',
+                       type=str,
+                       required=False,
+                       default=None,
+                       help='A custom S3 endpoint URL')
 
     paser.set_defaults(handler=_cli)
     return paser
@@ -54,7 +59,7 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
 def _cli(args: Namespace) -> None:
     try:
         pfs: List[ParquetFile] = [
-            to_parquet_file(file_exp=f, awsprofile=args.awsprofile)
+            to_parquet_file(file_exp=f, awsprofile=args.awsprofile, endpoint_url=args.endpoint_url)
             for f in args.file]
         with get_datafame_from_objs(pfs, args.head) as df:
             if df is None:
