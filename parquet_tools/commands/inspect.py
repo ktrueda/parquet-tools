@@ -29,13 +29,18 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
                        required=False,
                        default=False,
                        help='Detail expression using thrift.')
+    paser.add_argument('--endpoint-url',
+                       type=str,
+                       required=False,
+                       default=None,
+                       help='A custom S3 endpoint URL')
 
     paser.set_defaults(handler=_cli)
     return paser
 
 
 def _cli(args: Namespace) -> None:
-    pf: ParquetFile = to_parquet_file(file_exp=args.file, awsprofile=args.awsprofile)
+    pf: ParquetFile = to_parquet_file(file_exp=args.file, awsprofile=args.awsprofile, endpoint_url=args.endpoint_url)
     if pf.is_wildcard():
         print('Cannot use wildcard for inspection.', file=sys.stderr)
     else:

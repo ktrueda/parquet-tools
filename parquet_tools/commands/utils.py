@@ -105,6 +105,7 @@ class S3ParquetFile(ParquetFile):
     aws_session: boto3.Session
     bucket: str
     key: str
+    endpoint_url: Optional[str] = None
 
     def validation(self):
         ''' key can have *. But it must be last of the string.
@@ -116,7 +117,7 @@ class S3ParquetFile(ParquetFile):
         return '*' in self.key
 
     def resolve_wildcard(self) -> List[ParquetFile]:
-        list_res = self.aws_session.client('s3')\
+        list_res = self.aws_session.client('s3', endpoint_url=self.endpoint_url)\
             .list_objects_v2(
             Bucket=self.bucket,
             Prefix=self.key[:-1]  # remove *
@@ -128,7 +129,7 @@ class S3ParquetFile(ParquetFile):
             return []
         keys = [e['Key'] for e in list_res['Contents']]
         return sorted(
-            [S3ParquetFile(aws_session=self.aws_session, bucket=self.bucket, key=key) for key in keys],
+            [S3ParquetFile(aws_session=self.aws_session, bucket=self.bucket, key=key, endpoint_url=self.endpoint_url) for key in keys],
             key=lambda x: x.key
         )
 
@@ -141,7 +142,7 @@ class S3ParquetFile(ParquetFile):
             logger.info(f'Download stat parquet file on s3://{self.bucket}/{self.key} -> {localfile}')
             try:
                 with Halo(text='Downloading from s3', spinner='dots', stream=stderr) as spinner:
-                    self.aws_session.resource('s3')\
+                    self.aws_session.resource('s3', endpoint_url=self.endpoint_url)\
                         .meta.client.download_file(self.bucket, self.key, localfile)
                     spinner.info(f's3://{self.bucket}/{self.key} => {localfile}')
             except Exception:
@@ -158,7 +159,7 @@ def _is_s3_file(filename: str) -> bool:
     return filename[:5] == 's3://'
 
 
-def to_parquet_file(file_exp: str, awsprofile: Optional[str]) -> ParquetFile:
+def to_parquet_file(file_exp: str, awsprofile: Optional[str], endpoint_url: Optional[str]) -> ParquetFile:
     '''Transform file_exp to ParquetFile object.
     '''
     if _is_s3_file(file_exp):
@@ -166,7 +167,8 @@ def to_parquet_file(file_exp: str, awsprofile: Optional[str]) -> ParquetFile:
         return S3ParquetFile(
             aws_session=get_aws_session(awsprofile),
             bucket=parsed_url.netloc,
-            key=parsed_url.path[1:]
+            key=parsed_url.path[1:],
+            endpoint_url=endpoint_url
         )
     else:
         return LocalParquetFile(

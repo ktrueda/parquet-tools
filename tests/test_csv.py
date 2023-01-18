@@ -36,17 +36,19 @@ def parquet_file():
             'columns': [],
             'file': ['file1.parquet'],
             'head': -1,
-            'awsprofile': None
+            'awsprofile': None,
+            'endpoint_url': None
         }
     ),
     # most complex one
     (
-        '--columns col1,col2 --head 100 --awsprofile user1 file1.parquet file2.parquet', True,
+        '--columns col1,col2 --head 100 --endpoint-url http://localhost:9000 --awsprofile user1 file1.parquet file2.parquet', True,
         {
             'columns': ['col1', 'col2'],
             'file': ['file1.parquet', 'file2.parquet'],
             'head': 100,
-            'awsprofile': 'user1'
+            'awsprofile': 'user1',
+            'endpoint_url': 'http://localhost:9000'
         }
     ),
     # empty columns

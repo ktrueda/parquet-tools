@@ -22,7 +22,8 @@ def parser():
             'file': ['file1.parquet'],
             'format': 'psql',
             'head': -1,
-            'awsprofile': None
+            'awsprofile': None,
+            'endpoint_url': None
         }
     ),
     # most complex one
@@ -33,7 +34,8 @@ def parser():
             'file': ['file1.parquet', 'file2.parquet'],
             'format': 'github',
             'head': 100,
-            'awsprofile': None
+            'awsprofile': None,
+            'endpoint_url': None
         }
     ),
     # file is on S3
@@ -44,7 +46,8 @@ def parser():
             'file': ['s3://bucket-name/file1.parquet'],
             'format': 'psql',
             'head': -1,
-            'awsprofile': 'user1'
+            'awsprofile': 'user1',
+            'endpoint_url': None
         }
     ),
     # empty columns
