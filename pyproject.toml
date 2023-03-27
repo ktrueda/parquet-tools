@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parquet_tools"
-version = "0.2.12"
+version = "0.2.13"
 description = "Easy install parquet-tools"
 authors = ["Kentaro Ueda <kentaro.ueda.kentaro@gmail.com>"]
 license = "MIT"
