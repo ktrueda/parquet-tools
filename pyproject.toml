@@ -14,7 +14,7 @@ exclude = ["parquet_tools/parquet.thrift", "parquet_tools/README.md"]
 python = "^3.8"
 halo = "^0.0.29"
 pyarrow = "*"
-pandas = "^1"
+pandas = ">=1"
 tabulate = "^0.8.7"
 boto3 = "^1.13"
 thrift = "^0.13.0"
