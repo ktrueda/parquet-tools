@@ -36,12 +36,12 @@ def test_excute_simple(capfd, parquet_file):
     assert err == ''
     assert out == '''
 ############ file meta data ############
-created_by: parquet-cpp-arrow version 5.0.0
+created_by: parquet-cpp-arrow version 14.0.2
 num_columns: 3
 num_rows: 3
 num_row_groups: 1
-format_version: 1.0
-serialized_size: 2222
+format_version: 2.6
+serialized_size: 2223
 
 
 ############ Columns ############
