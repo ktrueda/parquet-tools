@@ -18,7 +18,7 @@ class TestGetMetaData:
     def test_version(self, fmd):
         assert fmd.version == 2
 
-    def test_schma(self, fmd):
+    def test_schema(self, fmd):
         assert fmd.schema == [
             SchemaElement(
                 type=None,
