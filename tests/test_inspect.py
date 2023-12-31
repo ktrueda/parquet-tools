@@ -1,18 +1,14 @@
-import pytest
-from parquet_tools.commands.inspect import _execute_detail, _execute_simple
 import pyarrow as pa
-import pandas as pd
+import pytest
 from tempfile import TemporaryDirectory
-import numpy as np
+
+from parquet_tools.commands.inspect import _execute_detail, _execute_simple
+from tests.test_parquets import get_test_dataframe
 
 
 @pytest.fixture
 def parquet_file():
-    df = pd.DataFrame(
-        {'one': [-1, np.nan, 2.5],
-         'two': ['foo', 'bar', 'baz'],
-         'three': [True, False, True]}
-    )
+    df = get_test_dataframe()
     table = pa.Table.from_pandas(df)
     with TemporaryDirectory() as tmp_path:
         pq_path = f'{tmp_path}/test.pq'

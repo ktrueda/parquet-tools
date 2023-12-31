@@ -11,8 +11,7 @@ class TestGetMetaData:
         return fmd
 
     def test_version(self, fmd):
-
-        assert fmd.version == 1
+        assert fmd.version == 2
 
     def test_schma(self, fmd):
         assert fmd.schema == [
@@ -88,7 +87,7 @@ class TestGetMetaData:
                         file_offset=108,
                         meta_data=ColumnMetaData(
                             type=5,
-                            encodings=[2, 0, 3],
+                            encodings=[0, 3, 8],
                             path_in_schema=['one'],
                             codec=1,
                             num_values=3,
@@ -109,11 +108,11 @@ class TestGetMetaData:
                             encoding_stats=[
                                 PageEncodingStats(
                                     page_type=2,
-                                    encoding=2,
+                                    encoding=0,
                                     count=1),
                                 PageEncodingStats(
                                     page_type=0,
-                                    encoding=2,
+                                    encoding=8,
                                     count=1)],
                             bloom_filter_offset=None),
                         offset_index_offset=None,
@@ -127,7 +126,7 @@ class TestGetMetaData:
                         file_offset=281,
                         meta_data=ColumnMetaData(
                             type=6,
-                            encodings=[2, 0, 3],
+                            encodings=[0, 3, 8],
                             path_in_schema=['two'],
                             codec=1,
                             num_values=3,
@@ -147,11 +146,11 @@ class TestGetMetaData:
                             encoding_stats=[
                                 PageEncodingStats(
                                     page_type=2,
-                                    encoding=2,
+                                    encoding=0,
                                     count=1),
                                 PageEncodingStats(
                                     page_type=0,
-                                    encoding=2,
+                                    encoding=8,
                                     count=1)
                             ],
                             bloom_filter_offset=None
@@ -168,7 +167,7 @@ class TestGetMetaData:
                         file_offset=388,
                         meta_data=ColumnMetaData(
                             type=0,
-                            encodings=[0, 3],
+                            encodings=[3, 0],
                             path_in_schema=['three'],
                             codec=1,
                             num_values=3,
@@ -200,10 +199,10 @@ class TestGetMetaData:
                         crypto_metadata=None,
                         encrypted_column_metadata=None
                     )],
-                total_byte_size=226,
+                total_byte_size=216,
                 num_rows=3,
                 sorting_columns=None,
-                file_offset=108,
+                file_offset=4,
                 total_compressed_size=226,
                 ordinal=0)
         ]
@@ -212,8 +211,8 @@ class TestGetMetaData:
         assert fmd.key_value_metadata == [
             KeyValue(
                 key='pandas',
-                value='{"index_columns": [{"kind": "range", "name": null, "start": 0, "stop": 3, "step": 1}], "column_indexes": [{"name": null, "field_name": null, "pandas_type": "unicode", "numpy_type": "object", "metadata": {"encoding": "UTF-8"}}], "columns": [{"name": "one", "field_name": "one", "pandas_type": "float64", "numpy_type": "float64", "metadata": null}, {"name": "two", "field_name": "two", "pandas_type": "unicode", "numpy_type": "object", "metadata": null}, {"name": "three", "field_name": "three", "pandas_type": "bool", "numpy_type": "bool", "metadata": null}], "creator": {"library": "pyarrow", "version": "0.17.0"}, "pandas_version": "1.0.3"}'),
+                value='{"index_columns": [{"kind": "range", "name": null, "start": 0, "stop": 3, "step": 1}], "column_indexes": [{"name": null, "field_name": null, "pandas_type": "unicode", "numpy_type": "object", "metadata": {"encoding": "UTF-8"}}], "columns": [{"name": "one", "field_name": "one", "pandas_type": "float64", "numpy_type": "float64", "metadata": null}, {"name": "two", "field_name": "two", "pandas_type": "unicode", "numpy_type": "object", "metadata": null}, {"name": "three", "field_name": "three", "pandas_type": "bool", "numpy_type": "bool", "metadata": null}], "creator": {"library": "pyarrow", "version": "14.0.2"}, "pandas_version": "2.1.4"}'),
             KeyValue(
                 key='ARROW:schema',
-                value='/////4gDAAAQAAAAAAAKAA4ABgAFAAgACgAAAAABAwAQAAAAAAAKAAwAAAAEAAgACgAAALgCAAAEAAAAAQAAAAwAAAAIAAwABAAIAAgAAACQAgAABAAAAIECAAB7ImluZGV4X2NvbHVtbnMiOiBbeyJraW5kIjogInJhbmdlIiwgIm5hbWUiOiBudWxsLCAic3RhcnQiOiAwLCAic3RvcCI6IDMsICJzdGVwIjogMX1dLCAiY29sdW1uX2luZGV4ZXMiOiBbeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiBudWxsLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IHsiZW5jb2RpbmciOiAiVVRGLTgifX1dLCAiY29sdW1ucyI6IFt7Im5hbWUiOiAib25lIiwgImZpZWxkX25hbWUiOiAib25lIiwgInBhbmRhc190eXBlIjogImZsb2F0NjQiLCAibnVtcHlfdHlwZSI6ICJmbG9hdDY0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ0d28iLCAiZmllbGRfbmFtZSI6ICJ0d28iLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAidGhyZWUiLCAiZmllbGRfbmFtZSI6ICJ0aHJlZSIsICJwYW5kYXNfdHlwZSI6ICJib29sIiwgIm51bXB5X3R5cGUiOiAiYm9vbCIsICJtZXRhZGF0YSI6IG51bGx9XSwgImNyZWF0b3IiOiB7ImxpYnJhcnkiOiAicHlhcnJvdyIsICJ2ZXJzaW9uIjogIjAuMTcuMCJ9LCAicGFuZGFzX3ZlcnNpb24iOiAiMS4wLjMifQAAAAYAAABwYW5kYXMAAAMAAABsAAAAMAAAAAQAAACw////AAABBhQAAAAMAAAABAAAAAAAAADY////BQAAAHRocmVlAAAA2P///wAAAQUYAAAAEAAAAAQAAAAAAAAABAAEAAQAAAADAAAAdHdvABAAFAAIAAYABwAMAAAAEAAQAAAAAAABAyAAAAAUAAAABAAAAAAAAAAAAAYACAAGAAYAAAAAAAIAAwAAAG9uZQAAAAAA')
+                value='/////4gDAAAQAAAAAAAKAA4ABgAFAAgACgAAAAABBAAQAAAAAAAKAAwAAAAEAAgACgAAALgCAAAEAAAAAQAAAAwAAAAIAAwABAAIAAgAAACQAgAABAAAAIECAAB7ImluZGV4X2NvbHVtbnMiOiBbeyJraW5kIjogInJhbmdlIiwgIm5hbWUiOiBudWxsLCAic3RhcnQiOiAwLCAic3RvcCI6IDMsICJzdGVwIjogMX1dLCAiY29sdW1uX2luZGV4ZXMiOiBbeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiBudWxsLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IHsiZW5jb2RpbmciOiAiVVRGLTgifX1dLCAiY29sdW1ucyI6IFt7Im5hbWUiOiAib25lIiwgImZpZWxkX25hbWUiOiAib25lIiwgInBhbmRhc190eXBlIjogImZsb2F0NjQiLCAibnVtcHlfdHlwZSI6ICJmbG9hdDY0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ0d28iLCAiZmllbGRfbmFtZSI6ICJ0d28iLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAidGhyZWUiLCAiZmllbGRfbmFtZSI6ICJ0aHJlZSIsICJwYW5kYXNfdHlwZSI6ICJib29sIiwgIm51bXB5X3R5cGUiOiAiYm9vbCIsICJtZXRhZGF0YSI6IG51bGx9XSwgImNyZWF0b3IiOiB7ImxpYnJhcnkiOiAicHlhcnJvdyIsICJ2ZXJzaW9uIjogIjE0LjAuMiJ9LCAicGFuZGFzX3ZlcnNpb24iOiAiMi4xLjQifQAAAAYAAABwYW5kYXMAAAMAAABsAAAAMAAAAAQAAACw////AAABBhAAAAAYAAAABAAAAAAAAAAFAAAAdGhyZWUAAADc////2P///wAAAQUQAAAAGAAAAAQAAAAAAAAAAwAAAHR3bwAEAAQABAAAABAAFAAIAAYABwAMAAAAEAAQAAAAAAABAxAAAAAcAAAABAAAAAAAAAADAAAAb25lAAAABgAIAAYABgAAAAAAAgAAAAAA')
         ]
