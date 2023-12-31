@@ -17,6 +17,8 @@ def write_test_dataframes():
     tests_dir = dirname(__file__)
     df.to_parquet(f'{tests_dir}/test1.parquet')
     df.to_parquet(f'{tests_dir}/test2.parquet')
+    df0 = pd.DataFrame({ 'a': [], 'b': [], 'c': [], 'd': [], }).astype({ 'a': float, 'b': str, 'c': int, 'd': bool })
+    df0.to_parquet(f'{tests_dir}/test0.parquet')
 
 
 if __name__ == '__main__':

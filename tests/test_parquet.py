@@ -1,3 +1,8 @@
+from os import path
+from os.path import dirname
+
+from subprocess import check_output
+
 from parquet_tools.parquet.reader import get_filemetadata
 from parquet_tools.gen_py.parquet.ttypes import (FileMetaData, SchemaElement, LogicalType, StringType, RowGroup, ColumnMetaData, ColumnChunk,
                                                  Statistics, PageEncodingStats, KeyValue)
@@ -216,3 +221,12 @@ class TestGetMetaData:
                 key='ARROW:schema',
                 value='/////4gDAAAQAAAAAAAKAA4ABgAFAAgACgAAAAABBAAQAAAAAAAKAAwAAAAEAAgACgAAALgCAAAEAAAAAQAAAAwAAAAIAAwABAAIAAgAAACQAgAABAAAAIECAAB7ImluZGV4X2NvbHVtbnMiOiBbeyJraW5kIjogInJhbmdlIiwgIm5hbWUiOiBudWxsLCAic3RhcnQiOiAwLCAic3RvcCI6IDMsICJzdGVwIjogMX1dLCAiY29sdW1uX2luZGV4ZXMiOiBbeyJuYW1lIjogbnVsbCwgImZpZWxkX25hbWUiOiBudWxsLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IHsiZW5jb2RpbmciOiAiVVRGLTgifX1dLCAiY29sdW1ucyI6IFt7Im5hbWUiOiAib25lIiwgImZpZWxkX25hbWUiOiAib25lIiwgInBhbmRhc190eXBlIjogImZsb2F0NjQiLCAibnVtcHlfdHlwZSI6ICJmbG9hdDY0IiwgIm1ldGFkYXRhIjogbnVsbH0sIHsibmFtZSI6ICJ0d28iLCAiZmllbGRfbmFtZSI6ICJ0d28iLCAicGFuZGFzX3R5cGUiOiAidW5pY29kZSIsICJudW1weV90eXBlIjogIm9iamVjdCIsICJtZXRhZGF0YSI6IG51bGx9LCB7Im5hbWUiOiAidGhyZWUiLCAiZmllbGRfbmFtZSI6ICJ0aHJlZSIsICJwYW5kYXNfdHlwZSI6ICJib29sIiwgIm51bXB5X3R5cGUiOiAiYm9vbCIsICJtZXRhZGF0YSI6IG51bGx9XSwgImNyZWF0b3IiOiB7ImxpYnJhcnkiOiAicHlhcnJvdyIsICJ2ZXJzaW9uIjogIjE0LjAuMiJ9LCAicGFuZGFzX3ZlcnNpb24iOiAiMi4xLjQifQAAAAYAAABwYW5kYXMAAAMAAABsAAAAMAAAAAQAAACw////AAABBhAAAAAYAAAABAAAAAAAAAAFAAAAdGhyZWUAAADc////2P///wAAAQUQAAAAGAAAAAQAAAAAAAAAAwAAAHR3bwAEAAQABAAAABAAFAAIAAYABwAMAAAAEAAQAAAAAAABAxAAAAAcAAAABAAAAAAAAAADAAAAb25lAAAABgAIAAYABgAAAAAAAgAAAAAA')
         ]
+
+    def test_inspect(self):
+        tests_dir = dirname(__file__)
+        test0_parquet_path = path.join(tests_dir, 'test0.parquet')
+        actual = check_output(['parquet-tools', 'inspect', test0_parquet_path]).decode()
+        expected_path = path.join(tests_dir, 'test0_inspect.txt')
+        with open(expected_path, 'r') as f:
+            expected = f.read()
+        assert actual == expected

@@ -1,0 +1,56 @@
+
+############ file meta data ############
+created_by: parquet-cpp-arrow version 14.0.2
+num_columns: 4
+num_rows: 0
+num_row_groups: 1
+format_version: 2.6
+serialized_size: 2398
+
+
+############ Columns ############
+a
+b
+c
+d
+
+############ Column(a) ############
+name: a
+path: a
+max_definition_level: 1
+max_repetition_level: 0
+physical_type: DOUBLE
+logical_type: None
+converted_type (legacy): NONE
+compression: SNAPPY (space_saved: -7%)
+
+############ Column(b) ############
+name: b
+path: b
+max_definition_level: 1
+max_repetition_level: 0
+physical_type: INT32
+logical_type: Null
+converted_type (legacy): NONE
+compression: SNAPPY (space_saved: -7%)
+
+############ Column(c) ############
+name: c
+path: c
+max_definition_level: 1
+max_repetition_level: 0
+physical_type: INT64
+logical_type: None
+converted_type (legacy): NONE
+compression: SNAPPY (space_saved: -7%)
+
+############ Column(d) ############
+name: d
+path: d
+max_definition_level: 1
+max_repetition_level: 0
+physical_type: BOOLEAN
+logical_type: None
+converted_type (legacy): NONE
+compression: SNAPPY (space_saved: N/A)
+
