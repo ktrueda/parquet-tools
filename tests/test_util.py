@@ -19,6 +19,7 @@ class TestLocalParquetFile:
     @pytest.mark.parametrize('pf, expected', [
         (
             LocalParquetFile(path='./tests/*.parquet'), [
+                LocalParquetFile('./tests/test0.parquet'),
                 LocalParquetFile('./tests/test1.parquet'),
                 LocalParquetFile('./tests/test2.parquet')
             ]
@@ -82,11 +83,13 @@ class TestResolveWildcard:
             LocalParquetFile(path='./tests/*.parquet'),
         )
 
-        assert len(actual) == 2
+        assert len(actual) == 3
         assert isinstance(actual[0], LocalParquetFile)
+        assert isinstance(actual[1], LocalParquetFile)
         assert isinstance(actual[1], LocalParquetFile)
 
         assert {a.path for a in actual} == {
+            './tests/test0.parquet',
             './tests/test1.parquet',
             './tests/test2.parquet',
         }

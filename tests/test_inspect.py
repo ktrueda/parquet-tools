@@ -1,18 +1,14 @@
-import pytest
-from parquet_tools.commands.inspect import _execute_detail, _execute_simple
 import pyarrow as pa
-import pandas as pd
+import pytest
 from tempfile import TemporaryDirectory
-import numpy as np
+
+from parquet_tools.commands.inspect import _execute_detail, _execute_simple
+from tests.test_parquets import get_test_dataframe
 
 
 @pytest.fixture
 def parquet_file():
-    df = pd.DataFrame(
-        {'one': [-1, np.nan, 2.5],
-         'two': ['foo', 'bar', 'baz'],
-         'three': [True, False, True]}
-    )
+    df = get_test_dataframe()
     table = pa.Table.from_pandas(df)
     with TemporaryDirectory() as tmp_path:
         pq_path = f'{tmp_path}/test.pq'
@@ -36,12 +32,12 @@ def test_excute_simple(capfd, parquet_file):
     assert err == ''
     assert out == '''
 ############ file meta data ############
-created_by: parquet-cpp-arrow version 5.0.0
+created_by: parquet-cpp-arrow version 14.0.2
 num_columns: 3
 num_rows: 3
 num_row_groups: 1
-format_version: 1.0
-serialized_size: 2222
+format_version: 2.6
+serialized_size: 2223
 
 
 ############ Columns ############

@@ -89,8 +89,13 @@ def _simple_schema_expression(file_meta, schema) -> str:
     for i, column in enumerate(columns):
         col = schema.column(i)
         col_meta = file_meta.row_group(0).column(i)
-        col_compression_space_saving_ratio = 1 - (col_meta.total_compressed_size / col_meta.total_uncompressed_size)
-        col_compression = f"{col_meta.compression} (space_saved: {col_compression_space_saving_ratio*100:.0f}%)"
+        if col_meta.total_uncompressed_size:
+            col_compression_space_saving_ratio = 1 - (col_meta.total_compressed_size / col_meta.total_uncompressed_size)
+            col_compression_space_saving_pct = col_compression_space_saving_ratio * 100
+            col_compression_space_saving_pct_str = f"{col_compression_space_saving_pct:.0f}%"
+        else:
+            col_compression_space_saving_pct_str = 'N/A'
+        col_compression = f"{col_meta.compression} (space_saved: {col_compression_space_saving_pct_str})"
         exp += dedent(f'''
         ############ Column({column}) ############
         name: {col.name}
