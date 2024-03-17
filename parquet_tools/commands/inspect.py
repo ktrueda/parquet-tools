@@ -33,7 +33,6 @@ def configure_parser(paser: ArgumentParser) -> ArgumentParser:
     paser.add_argument('--endpoint-url',
                        type=str,
                        required=False,
-                       default=None,
                        default=os.environ.get('ENDPOINT_URL'),
                        help='A custom S3 endpoint URL')
 
