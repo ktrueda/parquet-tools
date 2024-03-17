@@ -11,7 +11,7 @@ keywords = ["parquet-tools", "parquet"]
 exclude = ["parquet_tools/parquet.thrift", "parquet_tools/README.md"]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.9"
 halo = "^0.0.31"
 pyarrow = "*"
 pandas = "^2.1.4"
