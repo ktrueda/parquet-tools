@@ -28,7 +28,7 @@ pyarrow = "14.0.2"  # various test outputs are sensitive to this
 pylint = "^3.0.3"
 pytest = "^7.4.3"
 pytest-mock = "^3.12.0"
-moto = "^4.2.12"
+moto = ">=4.2.12 <6"
 wheel = "^0.42.0"
 twine = "^4.0.2"
 
